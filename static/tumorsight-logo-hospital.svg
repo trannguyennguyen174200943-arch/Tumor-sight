@@ -1,0 +1,38 @@
+<svg width="256" height="256" viewBox="0 0 256 256" xmlns="http://www.w3.org/2000/svg">
+  <!-- Brain icon with medical style -->
+  <g transform="translate(128, 128)">
+    <!-- Outer circle background -->
+    <circle cx="0" cy="0" r="110" fill="#ffffff" stroke="#16a3a0" stroke-width="2"/>
+    
+    <!-- Brain left hemisphere -->
+    <path d="M -40 -20 Q -65 -15 -70 10 Q -65 45 -35 52 Q -5 48 0 20 Z" 
+          fill="none" stroke="#16a3a0" stroke-width="3" stroke-linejoin="round"/>
+    
+    <!-- Brain right hemisphere -->
+    <path d="M 40 -20 Q 65 -15 70 10 Q 65 45 35 52 Q 5 48 0 20 Z" 
+          fill="none" stroke="#16a3a0" stroke-width="3" stroke-linejoin="round"/>
+    
+    <!-- Brain center line -->
+    <path d="M 0 -15 L 0 45" stroke="#16a3a0" stroke-width="2" opacity="0.5"/>
+    
+    <!-- Brain ridges/convolutions left -->
+    <path d="M -25 -8 Q -38 0 -35 15" fill="none" stroke="#16a3a0" stroke-width="2" opacity="0.6"/>
+    <path d="M -15 -12 Q -28 -5 -25 10" fill="none" stroke="#16a3a0" stroke-width="1.5" opacity="0.5"/>
+    
+    <!-- Brain ridges/convolutions right -->
+    <path d="M 25 -8 Q 38 0 35 15" fill="none" stroke="#16a3a0" stroke-width="2" opacity="0.6"/>
+    <path d="M 15 -12 Q 28 -5 25 10" fill="none" stroke="#16a3a0" stroke-width="1.5" opacity="0.5"/>
+    
+    <!-- Tumor indicator (subtle) -->
+    <circle cx="-18" cy="8" r="8" fill="#f06f5a" opacity="0.7"/>
+    <circle cx="-18" cy="8" r="8" fill="none" stroke="#f06f5a" stroke-width="1.5" opacity="0.9"/>
+    
+    <!-- MRI scan wave indicator top right -->
+    <g opacity="0.6">
+      <path d="M 45 -50 Q 55 -45 60 -50 Q 65 -55 75 -50" 
+            fill="none" stroke="#2d99ff" stroke-width="2" stroke-linecap="round"/>
+      <path d="M 45 -40 Q 55 -35 60 -40 Q 65 -45 75 -40" 
+            fill="none" stroke="#2d99ff" stroke-width="2" stroke-linecap="round"/>
+    </g>
+  </g>
+</svg>

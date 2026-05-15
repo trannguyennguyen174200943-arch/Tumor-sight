@@ -1,0 +1,574 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <title>TumorSight | Điều phối ca u não 3D</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="/static/tumorsight-logo-hospital.svg">
+  <link rel="apple-touch-icon" href="/static/tumorsight-logo-hospital.svg">
+  <link rel="stylesheet" href="/static/styles.css?v=20260419-academic-layout">
+  <link rel="stylesheet" href="/static/clinical-depth.css?v=20260419-academic-layout">
+  <link rel="stylesheet" href="/static/effects.css?v=20260419-academic-layout">
+  <script>
+    (function () {
+      const knownFormKeys = ['patient_name=', 'modality=', 'timepoint_count=', 'dicom_files='];
+      const search = window.location.search.toLowerCase();
+      if (search && knownFormKeys.some((key) => search.includes(key)) && window.history?.replaceState) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+
+      document.addEventListener('submit', function (event) {
+        const form = event.target;
+        if (form && form.id === 'analysis-form') {
+          event.preventDefault();
+          event.stopPropagation();
+          return false;
+        }
+      }, true);
+    })();
+  </script>
+</head>
+<body>
+  <div class="app-frame">
+    <div class="page-shell">
+      <header class="masthead">
+        <div class="brand-bar">
+          <div class="brand-lockup">
+            <img class="brand-logo" src="/static/tumorsight-logo-hospital.svg" alt="TumorSight logo">
+            <div class="brand-copy">
+              <span class="brand-eyebrow">TumorSight Clinical AI</span>
+              <strong>TumorSight</strong>
+              <span class="brand-note">Clinical command center cho tiếp nhận, phân đoạn, đánh giá nguy cơ và theo dõi u não 3D.</span>
+            </div>
+          </div>
+
+          <div class="masthead-meta" aria-label="Tình trạng nền tảng">
+            <span class="meta-pill">Khoa CĐHA thần kinh</span>
+            <span class="meta-pill">Tumor board từ xa</span>
+            <span class="meta-pill">PACS 3D</span>
+          </div>
+        </div>
+      </header>
+
+      <nav class="workflow-nav" aria-label="Dieu huong pipeline">
+        <a href="#stage-input">Intake</a>
+        <a href="#stage-viewing">Case Lab</a>
+        <a href="#stage-preprocessing">Preprocess</a>
+        <a href="#stage-analysis">Analysis</a>
+        <a href="#stage-coordination">Decision</a>
+        <a href="#stage-portfolio">Portfolio</a>
+      </nav>
+
+      <header class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">TumorSight Command Center</span>
+          <h1>Điều phối ca u não 3D</h1>
+          <p class="hero-description">
+            Một dashboard duy nhất để tiếp nhận study mới, dựng segmentation, xem mô hình 3D,
+            tổng hợp morphology, phân loại nguy cơ và đẩy báo cáo cho hội chẩn lâm sàng.
+          </p>
+
+          <div class="hero-actions">
+            <button id="load-demo">Mở ca gần nhất</button>
+            <button class="ghost" id="jump-upload">Tiếp nhận study mới</button>
+          </div>
+
+          <div id="model-status-strip" class="model-status-strip"></div>
+        </div>
+
+        <div class="hero-visual">
+          <div class="hero-panel">
+            <div class="hero-panel-top">
+              <span class="label">Hồ sơ đang mở</span>
+              <span class="signal-dot"></span>
+            </div>
+
+            <strong id="summary-risk">Ưu tiên lâm sàng --</strong>
+            <span id="summary-forecast">--</span>
+
+            <div class="hero-mini-grid">
+              <div class="mini-card">
+                <span>Trạng thái</span>
+                <strong id="summary-ready">Chờ rà soát</strong>
+              </div>
+              <div class="mini-card">
+                <span>Phân luồng</span>
+                <strong id="summary-priority">Chưa phân luồng</strong>
+              </div>
+            </div>
+
+            <div class="hero-note">
+              Segmentation 3D, morphology, risk scoring, progression và report bundle đều được gom về cùng một luồng.
+            </div>
+          </div>
+
+          <div class="hero-orbit-card">
+            <div class="orbit-core">
+              <span>3D</span>
+            </div>
+            <div class="orbit-node orbit-node-a">Segmentation</div>
+            <div class="orbit-node orbit-node-b">Morphology</div>
+            <div class="orbit-node orbit-node-c">Risk</div>
+            <div class="orbit-node orbit-node-d">Follow-up</div>
+          </div>
+        </div>
+      </header>
+
+      <section class="overview-band" aria-label="Tổng quan học thuật và vận hành">
+        <article class="panel research-panel">
+          <div class="section-head compact">
+            <div>
+              <span class="kicker">Academic Core</span>
+              <h3>Nền tảng học thuật</h3>
+            </div>
+          </div>
+          <p class="research-copy">
+            Hệ thống tập trung vào phân tích volumetric thật cho u não 3D: ingest DICOM đa chuỗi, segmentation đa kênh,
+            mesh reconstruction, radiomics hình thái, đánh giá nguy cơ, dự báo tiến triển và đóng gói hội chẩn.
+          </p>
+          <div class="research-chip-row">
+            <span class="research-chip">MONAI SegResNet</span>
+            <span class="research-chip">BraTS-style MRI</span>
+            <span class="research-chip">TTA Ensemble</span>
+            <span class="research-chip">Marching Cubes</span>
+            <span class="research-chip">Radiomics 3D</span>
+            <span class="research-chip">Teleconsultation</span>
+          </div>
+        </article>
+
+        <article class="panel runtime-panel-academic">
+          <div class="section-head compact">
+            <div>
+              <span class="kicker">Runtime</span>
+              <h3>Trạng thái triển khai</h3>
+            </div>
+          </div>
+          <div id="platform-metrics" class="metric-grid"></div>
+        </article>
+
+        <article class="panel evidence-panel-academic">
+          <div class="section-head compact">
+            <div>
+              <span class="kicker">Evidence</span>
+              <h3>Checkpoint và benchmark</h3>
+            </div>
+          </div>
+          <div id="evidence-card"></div>
+        </article>
+      </section>
+
+      <section class="logic-band" aria-label="Khung logic va governance hoc thuat">
+        <article class="panel methodology-panel">
+          <div class="section-head compact">
+            <div>
+              <span class="kicker">Methodology</span>
+              <h3>Khung suy luận lâm sàng</h3>
+            </div>
+          </div>
+          <div class="methodology-stack">
+            <div class="method-step">
+              <span class="method-step-index">01</span>
+              <div>
+                <strong>Chuẩn hóa đầu vào</strong>
+                <p>Nhóm study theo chuỗi MRI, giữ spacing thật và kiểm tra độ sẵn sàng trước suy luận.</p>
+              </div>
+            </div>
+            <div class="method-step">
+              <span class="method-step-index">02</span>
+              <div>
+                <strong>Suy luận phân đoạn</strong>
+                <p>Ensemble đa mô hình, TTA, foreground crop và lượng hóa bất định trên từng case.</p>
+              </div>
+            </div>
+            <div class="method-step">
+              <span class="method-step-index">03</span>
+              <div>
+                <strong>Radiomics và hình thái</strong>
+                <p>Trích xuất đặc trưng bờ, fractal, gradient, texture và hình học 3D từ mask thật.</p>
+              </div>
+            </div>
+            <div class="method-step">
+              <span class="method-step-index">04</span>
+              <div>
+                <strong>Decision support</strong>
+                <p>Hội tụ risk, progression, follow-up và teleconsultation trong cùng bundle ca bệnh.</p>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel governance-panel">
+          <div class="section-head compact">
+            <div>
+              <span class="kicker">Governance</span>
+              <h3>Model governance</h3>
+            </div>
+          </div>
+          <div id="governance-card"></div>
+        </article>
+
+        <article class="panel interpretability-panel">
+          <div class="section-head compact">
+            <div>
+              <span class="kicker">Interpretability</span>
+              <h3>Khả năng giải thích</h3>
+            </div>
+          </div>
+          <div id="interpretability-card"></div>
+        </article>
+      </section>
+
+      <main class="dashboard">
+        <section class="workflow-stage" id="stage-input">
+          <div class="stage-header">
+            <span class="stage-number">1</span>
+            <div>
+              <span class="stage-kicker">Intake</span>
+              <h2>Tiếp nhận study và kiểm tra runtime</h2>
+              <p class="stage-note">Tiếp nhận study mới, chuẩn hóa metadata đầu vào và kiểm tra mức sẵn sàng của pipeline trước khi suy luận.</p>
+            </div>
+          </div>
+
+          <div class="grid intake-layout">
+            <article class="panel intake-panel" id="upload-section">
+              <div class="section-head">
+                <div>
+                  <span class="kicker">Tiếp nhận</span>
+                  <h3>Tạo hồ sơ phân tích mới</h3>
+                </div>
+              </div>
+
+              <form
+                id="analysis-form"
+                class="upload-grid"
+                method="post"
+                action="/api/analyze"
+                enctype="multipart/form-data"
+                onsubmit="event.preventDefault(); return false;"
+              >
+                <label>
+                  <span>Tên bệnh nhân</span>
+                  <input type="text" name="patient_name" value="Bệnh nhân mới">
+                </label>
+
+                <label>
+                  <span>Phương thức chụp</span>
+                  <select name="modality">
+                    <option value="MRI">MRI</option>
+                    <option value="CT">CT</option>
+                  </select>
+                </label>
+
+                <label>
+                  <span>Số mốc thời gian</span>
+                  <input type="number" name="timepoint_count" min="1" max="5" value="3">
+                </label>
+
+                <label class="file-field">
+                  <span>DICOM / volume 3D</span>
+                  <input type="file" name="dicom_files" id="dicom-files" multiple required>
+                </label>
+
+                <button type="button" id="submit-analysis-btn">Phân tích</button>
+                <div id="upload-mode-badge" class="inference-note">Chưa có dữ liệu được chọn.</div>
+              </form>
+
+              <div id="analysis-job-status" class="analysis-job-status"></div>
+            </article>
+
+            <article class="panel intake-guide-panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Protocol</span>
+                  <h3>Quy chuẩn tiếp nhận</h3>
+                </div>
+              </div>
+
+              <div class="protocol-stack">
+                <div class="card protocol-card">
+                  <h3>Dữ liệu ưu tiên</h3>
+                  <ul>
+                    <li>Nhóm đúng chuỗi MRI theo `T1/T1ce/T2/FLAIR` nếu study đủ series.</li>
+                    <li>Giữ spacing thật để đo thể tích, kích thước và dựng mesh 3D.</li>
+                    <li>Không dùng số liệu giả trong segmentation, progression hay viewer.</li>
+                  </ul>
+                </div>
+
+                <div class="card protocol-card">
+                  <h3>Đầu ra chính</h3>
+                  <ul>
+                    <li>Mask 3D, probability map và preview trực giao từ model thật.</li>
+                    <li>Overlay lát cắt trong viewer để đối chiếu mesh với ảnh gốc.</li>
+                    <li>Board hội chẩn, timeline bệnh nhân và nhắc tái khám đồng bộ.</li>
+                  </ul>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="workflow-stage" id="stage-viewing">
+          <div class="stage-header">
+            <span class="stage-number">2</span>
+            <div>
+              <span class="stage-kicker">Command</span>
+              <h2>Điều phối ca bệnh và dựng mô hình 3D</h2>
+              <p class="stage-note">Không gian làm việc chính cho registry, hồ sơ ca bệnh, mô hình 3D và đối chiếu trực quan.</p>
+            </div>
+          </div>
+
+          <div class="grid two-col">
+            <article class="panel registry-panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Registry</span>
+                  <h3>Danh sách ca đang theo dõi</h3>
+                </div>
+              </div>
+              <div id="case-list" class="case-list"></div>
+            </article>
+
+            <article class="panel spotlight">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Selected Case</span>
+                  <h2 id="case-title">Chưa chọn ca bệnh</h2>
+                </div>
+              </div>
+
+              <div id="case-kpi-grid" class="case-kpi-grid"></div>
+
+              <div class="viewer-wrap">
+                <div class="viewer-3d-container">
+                  <div class="viewer-3d" id="viewer-3d">
+                    <div class="viewer-placeholder">
+                      <div class="placeholder-icon">◌</div>
+                      <p>Chọn ca bệnh để xem mô hình 3D khối u</p>
+                    </div>
+                  </div>
+
+                  <div class="viewer-info">
+                    <span class="viewer-label">Mô hình 3D khối u</span>
+                    <div class="viewer-controls">
+                      <button type="button" class="viewer-ctrl" id="viewer-reset" title="Đặt lại">↺</button>
+                      <button type="button" class="viewer-ctrl" id="viewer-zoom-in" title="Phóng to">+</button>
+                      <button type="button" class="viewer-ctrl" id="viewer-zoom-out" title="Thu nhỏ">−</button>
+                      <button type="button" class="viewer-ctrl" id="viewer-rotate" title="Tự động xoay">⟳</button>
+                    </div>
+                  </div>
+
+                  <div class="viewer-stats">
+                    <div class="stat-item">
+                      <span class="stat-label">Thể tích</span>
+                      <span class="stat-value" id="tumor-volume">--</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">Bề mặt</span>
+                      <span class="stat-value" id="tumor-surface">--</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-label">Mật độ</span>
+                      <span class="stat-value" id="tumor-density">--</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="action-row viewer-actions">
+                  <button type="button" id="record-360-btn" class="ghost" disabled>Xuất video 360°</button>
+                  <button type="button" id="export-stl-btn" class="ghost" disabled>Tải STL</button>
+                </div>
+              </div>
+
+              <div id="viewer-reference-panel" class="viewer-reference-panel"></div>
+              <div id="case-details" class="detail-grid"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="workflow-stage" id="stage-preprocessing">
+          <div class="stage-header">
+            <span class="stage-number">3</span>
+            <div>
+              <span class="stage-kicker">Pipeline</span>
+              <h2>Tiền xử lý và chuẩn hóa dữ liệu</h2>
+              <p class="stage-note">Minh bạch hóa nguồn dữ liệu, chiến lược chuẩn hóa ảnh và từng bước xử lý để dễ kiểm tra lại.</p>
+            </div>
+          </div>
+
+          <div class="grid three-col">
+            <article class="panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Input</span>
+                  <h3>Đầu vào</h3>
+                </div>
+              </div>
+              <div id="ingestion-card" class="stats-stack"></div>
+            </article>
+
+            <article class="panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Preprocess</span>
+                  <h3>Chuẩn hóa volume</h3>
+                </div>
+              </div>
+              <div id="preprocessing-card" class="stats-stack"></div>
+            </article>
+
+            <article class="panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Workflow</span>
+                  <h3>Luồng xử lý</h3>
+                </div>
+              </div>
+              <div class="timeline" id="workflow-steps"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="workflow-stage" id="stage-analysis">
+          <div class="stage-header">
+            <span class="stage-number">4</span>
+            <div>
+              <span class="stage-kicker">Analysis</span>
+              <h2>Segmentation, morphology và đánh giá nguy cơ</h2>
+              <p class="stage-note">Khu vực phân tích sâu cho chất lượng phân đoạn, hình thái 3D, tín hiệu nguy cơ và giải thích quyết định.</p>
+            </div>
+          </div>
+
+          <div class="grid two-col-lg">
+            <article class="panel analysis-primary-panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Segmentation</span>
+                  <h3>Kết quả khối u não</h3>
+                </div>
+              </div>
+
+              <div id="segmentation-hero-card" class="segmentation-hero-card"></div>
+              <div id="segmentation-card" class="stats-stack"></div>
+              <div id="segmentation-downloads" class="action-row action-row-tight"></div>
+              <div id="segmentation-preview" class="segmentation-preview"></div>
+            </article>
+
+            <div class="analysis-side-stack">
+              <article class="panel panel-secondary">
+                <div class="section-head compact">
+                  <div>
+                    <span class="kicker">Morphology</span>
+                    <h3>Đặc tính khối u</h3>
+                  </div>
+                </div>
+                <div id="morphology-card" class="stats-stack"></div>
+              </article>
+
+              <article class="panel panel-secondary">
+                <div class="section-head compact">
+                  <div>
+                    <span class="kicker">Risk</span>
+                    <h3>Phân loại lâm sàng</h3>
+                  </div>
+                </div>
+                <div id="classification-card" class="decision-card"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <section class="workflow-stage" id="stage-coordination">
+          <div class="stage-header">
+            <span class="stage-number">5</span>
+            <div>
+              <span class="stage-kicker">Plan</span>
+              <h2>Điều trị, follow-up và hội chẩn từ xa</h2>
+              <p class="stage-note">Tổng hợp hành động tiếp theo cho bác sĩ điều trị, nhóm hội chẩn và lộ trình theo dõi ca bệnh.</p>
+            </div>
+          </div>
+
+          <div class="grid two-col">
+            <article class="panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Treatment</span>
+                  <h3>Phương án xử trí</h3>
+                </div>
+              </div>
+              <div id="treatment-card" class="decision-card"></div>
+            </article>
+
+            <article class="panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Follow-up</span>
+                  <h3>Tái khám và cảnh báo</h3>
+                </div>
+              </div>
+              <div id="followup-card" class="decision-card"></div>
+            </article>
+          </div>
+
+          <div class="grid two-col" style="margin-top: 16px;">
+            <article class="panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Teleconsultation</span>
+                  <h3>Gói hội chẩn từ xa</h3>
+                </div>
+              </div>
+              <div id="teleconsult-board" class="decision-card"></div>
+            </article>
+
+            <article class="panel">
+              <div class="section-head compact">
+                <div>
+                  <span class="kicker">Timeline</span>
+                  <h3>Diễn tiến theo từng mốc</h3>
+                </div>
+              </div>
+              <div id="timeline-card" class="decision-card"></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="workflow-stage" id="stage-portfolio">
+          <div class="stage-header">
+            <span class="stage-number">6</span>
+            <div>
+              <span class="stage-kicker">Archive</span>
+              <h2>Danh mục ca bệnh và năng lực vận hành</h2>
+              <p class="stage-note">Toàn cảnh danh mục hệ thống để đánh giá mức ưu tiên, độ sẵn sàng và độ phủ của pipeline.</p>
+            </div>
+          </div>
+
+          <article class="panel">
+            <div class="section-head compact">
+              <div>
+                <span class="kicker">Portfolio</span>
+                <h3>Toàn cảnh danh mục</h3>
+              </div>
+            </div>
+            <div id="portfolio-card" class="stats-stack"></div>
+          </article>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" aria-live="polite"></div>
+
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/loaders/STLLoader.js"></script>
+  <script src="/static/viewer3d.js?v=20260419-uploadfix"></script>
+  <script src="/static/viewer-enhancements.js?v=20260419-uploadfix"></script>
+  <script src="/static/app.js?v=20260419-uploadfix"></script>
+</body>
+</html>

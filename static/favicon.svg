@@ -1,0 +1,19 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <g transform="translate(32, 32)">
+    <circle cx="0" cy="0" r="28" fill="#ffffff" stroke="#16a3a0" stroke-width="1"/>
+    
+    <!-- Brain left -->
+    <path d="M -12 -6 Q -18 -4 -19 3 Q -17 12 -9 14 Q -2 12 0 6 Z" 
+          fill="none" stroke="#16a3a0" stroke-width="1" stroke-linejoin="round"/>
+    
+    <!-- Brain right -->
+    <path d="M 12 -6 Q 18 -4 19 3 Q 17 12 9 14 Q 2 12 0 6 Z" 
+          fill="none" stroke="#16a3a0" stroke-width="1" stroke-linejoin="round"/>
+    
+    <!-- Center -->
+    <path d="M 0 -5 L 0 13" stroke="#16a3a0" stroke-width="0.75" opacity="0.5"/>
+    
+    <!-- Tumor -->
+    <circle cx="-5" cy="2" r="2" fill="#f06f5a" opacity="0.7"/>
+  </g>
+</svg>

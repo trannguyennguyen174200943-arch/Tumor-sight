@@ -1,0 +1,133 @@
+@keyframes floatPulse {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes softGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 217, 200, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(56, 217, 200, 0.04);
+  }
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: rgba(56, 217, 200, 0.08);
+  }
+  50% {
+    border-color: rgba(56, 217, 200, 0.2);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.signal-dot {
+  animation: softGlow 2.8s ease-in-out infinite;
+}
+
+.orbit-core {
+  animation: floatPulse 4s ease-in-out infinite;
+}
+
+.panel,
+.card,
+.kpi-card,
+.case-item,
+.metric {
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease,
+    border-color 180ms ease,
+    background 180ms ease;
+}
+
+.panel:hover,
+.card:hover,
+.kpi-card:hover,
+.metric:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.case-item.active {
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+.segmentation-preview canvas,
+.viewer-3d canvas {
+  image-rendering: pixelated;
+}
+
+::selection {
+  background: rgba(56, 217, 200, 0.22);
+  color: var(--text);
+}
+
+::-moz-selection {
+  background: rgba(56, 217, 200, 0.22);
+  color: var(--text);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(14, 22, 38, 0.4);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(56, 217, 200, 0.18);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 217, 200, 0.3);
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(56, 217, 200, 0.4);
+  outline-offset: 3px;
+}
+
+/* Loading skeleton animation for async content */
+.skeleton {
+  background: linear-gradient(90deg,
+    rgba(14, 22, 38, 0.4) 25%,
+    rgba(56, 217, 200, 0.06) 50%,
+    rgba(14, 22, 38, 0.4) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 12px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

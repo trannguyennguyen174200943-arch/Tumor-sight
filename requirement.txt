@@ -1,0 +1,25 @@
+# Framework web API
+fastapi==0.104.1  # Framework web API hiện đại
+uvicorn==0.24.0  # Server ASGI để chạy FastAPI
+python-dotenv==1.0.0  # Tải biến môi trường từ file .env
+python-multipart==0.0.6  # Xử lý form multipart
+pydantic==2.5.0  # Validation dữ liệu
+
+# Deep Learning
+torch==2.1.0  # PyTorch - framework deep learning chính
+torchvision==0.16.0  # Thư viện xử lý ảnh cho PyTorch
+monai==1.3.0  # MONAI - Medical Open Network for AI
+
+# Xử lý dữ liệu y tế
+pydicom==2.4.0  # Đọc/ghi file DICOM
+SimpleITK==2.3.1  # ITK wrapper - xử lý ảnh y tế
+
+# Xử lý mảng và ảnh
+numpy==1.24.3  # Xử lý mảng số
+scipy==1.11.4  # Các hàm toán học khoa học
+scikit-image==0.21.0  # Xử lý ảnh
+pyvista==0.42.3  # Trực quan hóa 3D
+
+# Xử lý ảnh khác
+opencv-python==4.8.0.76  # OpenCV - xử lý ảnh
+pillow==10.0.0  # Xử lý ảnh PIL

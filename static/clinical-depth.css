@@ -1,0 +1,104 @@
+.benchmark-grid,
+.confidence-chip-row,
+.trend-strip {
+  display: grid;
+  gap: 12px;
+}
+
+.benchmark-grid {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.benchmark-card-item,
+.confidence-chip {
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--gradient-card);
+}
+
+.benchmark-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.benchmark-card-top span,
+.benchmark-card-item small,
+.confidence-chip span,
+.trend-point span,
+.trend-point small {
+  color: var(--muted);
+  font-family: "IBM Plex Mono", "IBM Plex Sans", monospace;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.benchmark-card-value,
+.confidence-chip strong {
+  display: block;
+  margin: 10px 0 12px;
+  font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  font-size: 21px;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.confidence-chip-row {
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+}
+
+.trend-strip {
+  grid-template-columns: repeat(auto-fit, minmax(84px, 1fr));
+  align-items: end;
+}
+
+.trend-point {
+  display: grid;
+  gap: 8px;
+  justify-items: center;
+  padding: 16px 12px;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  background: var(--gradient-card);
+}
+
+.trend-point strong {
+  font-size: 15px;
+}
+
+.trend-point--current {
+  border-color: rgba(56, 217, 200, 0.2);
+  background: linear-gradient(180deg, rgba(56, 217, 200, 0.06), rgba(14, 22, 38, 0.9));
+}
+
+.trend-point--projected {
+  border-color: rgba(255, 123, 107, 0.15);
+}
+
+.trend-bar-shell {
+  position: relative;
+  display: flex;
+  align-items: end;
+  width: 100%;
+  min-height: 132px;
+  padding: 10px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(14, 22, 38, 0.3), rgba(14, 22, 38, 0.6));
+}
+
+.trend-bar {
+  width: 100%;
+  border-radius: 10px 10px 4px 4px;
+  background: linear-gradient(180deg, var(--teal), var(--coral));
+}
+
+@media (max-width: 720px) {
+  .benchmark-grid,
+  .confidence-chip-row,
+  .trend-strip {
+    grid-template-columns: 1fr;
+  }
+}
